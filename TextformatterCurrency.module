@@ -1,0 +1,120 @@
+<?php
+
+/**
+ * ProcessWire Currency Textformatter.
+ *
+ * Copyright 2011-2015 Stephen Dickinson, QBox.co
+ *
+ * The above copyright notice and the following permissions and disclaimer shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * DO NOT DISTRIBUTE UNLESS PERMITTED UNDER THE TERMS OF YOUR LICENSE FILE
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+class TextformatterCurrency extends WireData implements Module, ConfigurableModule
+{
+    /**
+     * Default settings used by this module
+     */
+    static protected $defaultSettings = array(
+        'tfc_use_browser_locale'   => 1,
+        'tfc_currency_glue_string' => ' + ',
+        'tfc_currency_separator'   => '|',
+        'tfc_locale'               => 'en_GB',
+    );
+
+
+    public static function getModuleInfo()
+    {
+        return array(
+            'title'     => __('Textformatter for currencies.'),
+            'version'   => '1.0.0',
+            'summary'   => __('Provides a locale-aware currency formatter for text fields.'),
+            'permanent' => false,
+            'singular'  => true,
+            'author'    => 'Netcarver',
+        );
+    }
+
+
+    public function format(&$str) {
+		if(!strlen($str)) return;
+        $str = $this->formatCurrency($str);
+    }
+
+	public function formatValue(Page $page, Field $field, &$str) {
+		if(!strlen($str)) return;
+        $str = $this->formatCurrency($str);
+	}
+
+    protected function formatCurrency($str) {
+        $locale = ($this->tfc_locale) ?: 'en';
+        if ($this->tfc_use_browser_locale) {
+            $locale = locale_accept_from_http($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+        }
+        $fmt = new \NumberFormatter($locale, \NumberFormatter::CURRENCY);
+        $currencies = explode(trim($this->tfc_currency_separator), $str);
+        $out = array();
+        foreach ($currencies as $currency_and_amount) {
+            list($currency, $amount) = explode(' ', trim($currency_and_amount));
+            $st = $fmt->formatCurrency(trim($amount), trim($currency));
+            $st = str_replace('-', '−', $st);
+            $out[] = "{$st}";
+        }
+        return implode(" {$this->tfc_currency_glue_string} ", $out);
+    }
+
+
+    /**
+     * Build a form allowing configuration of this Module
+     */
+    static public function getModuleConfigInputfields(array $data)
+    {
+        $fields = new InputfieldWrapper();
+        $data   = array_merge(self::$defaultSettings, $data);
+        $m      = wire('modules');
+
+        $f = $m->get('InputfieldRadios');
+        $f->attr('name', 'tfc_use_browser_locale');
+        $f->label = __("Use the visiting browsers prefered locale when possible?");
+        $f->addOption(1, __('Yes, use the browser locale to determine how to format currency.'));
+        $f->addOption(0, __('No'));
+        $f->required = 1;
+        $f->value = $data['tfc_use_browser_locale'];
+        $f->columnWidth = 50;
+        $fields->add($f);
+
+        $f = $m->get('InputfieldText');
+        $f->attr('name', 'tfc_locale');
+        $f->label = __("What locale should be used for formatting if the browser locale is not used?");
+        $f->value = $data['tfc_locale'];
+        $f->columnWidth = 50;
+        $fields->add($f);
+
+        $f = $m->get('InputfieldText');
+        $f->attr('name', 'tfc_currency_separator');
+        $f->label = __("Separator for multiple unformatted currencies");
+        $f->value = $data['tfc_currency_separator'];
+        $f->columnWidth = 50;
+        $f->required = 1;
+        $fields->add($f);
+
+        $f = $m->get('InputfieldText');
+        $f->attr('name', 'tfc_currency_glue_string');
+        $f->label = __("Joiner for multiple formatted currencies");
+        $f->value = $data['tfc_currency_glue_string'];
+        $f->columnWidth = 50;
+        $f->required = 1;
+        $fields->add($f);
+
+        return $fields;
+    }
+}
