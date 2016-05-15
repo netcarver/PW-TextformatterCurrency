@@ -7,6 +7,7 @@ The module reads a conforming input money formatted string, splits it and format
 to the locale defined in the module settings. The module is capabale of using the visiting browser's headers to
 determine which locale to use when formatting monetary amounts of various currencies.
 
+Internally, the module uses PHPs Internationalization extension (_intl_) to actually do the formatting.
 
 Input money format
 ------------------
