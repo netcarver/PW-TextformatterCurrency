@@ -34,6 +34,5 @@ will join the localised outputs for each pair using the output glue string defin
 Examples Using Module Defaults
 ------------------------------
 
-Input ```GBP 50.99 | EUR 100``` gives ```£50.99 + €100.00``` when viewed in browser set to British English.
-Input ```GBP 50.99 | EUR 100``` gives ```50,99 £GB + 100,00 €``` using browser set to French.
+Input ```GBP 50.99 | EUR 100``` gives ```£50.99 + €100.00``` when viewed in browser set to British English but gives ```50,99 £GB + 100,00 €``` using a browser set to French.
 
