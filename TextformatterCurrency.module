@@ -44,14 +44,14 @@ class TextformatterCurrency extends WireData implements Module, ConfigurableModu
 
 
     public function format(&$str) {
-		if(!strlen($str)) return;
+        if(!strlen($str)) return;
         $str = $this->formatCurrency($str);
     }
 
-	public function formatValue(Page $page, Field $field, &$str) {
-		if(!strlen($str)) return;
+    public function formatValue(Page $page, Field $field, &$str) {
+        if(!strlen($str)) return;
         $str = $this->formatCurrency($str);
-	}
+    }
 
     protected function formatCurrency($str) {
         $locale = ($this->tfc_locale) ?: 'en';
