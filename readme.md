@@ -4,10 +4,10 @@ TextformatterCurrency
 A locale-aware currency formatter module for Processwire.
 
 The module reads a conforming input money formatted string, splits it and formats each valid monetary amount according
-to the locale defined in the module settings. The module is capabale of using the visiting browser's headers to
+to the locale defined in the module settings. The module is capable of using the visiting browser's headers to
 determine which locale to use when formatting monetary amounts of various currencies.
 
-Internally, the module uses PHPs Internationalization extension (_intl_) to actually do the formatting.
+Internally, the module uses PHPs Internationalization extension (_intl_) to do the formatting.
 
 Input money format
 ------------------
