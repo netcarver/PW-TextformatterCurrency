@@ -30,3 +30,10 @@ Each currency-amount pair is formatted using the defined locale or that supplied
 localised in the output of the formatter. If the input text has more than one currency-amount money pair then the output
 will join the localised outputs for each pair using the output glue string defined in the module settings.
 
+
+Examples Using Module Defaults
+------------------------------
+
+Input ```GBP 50.99 | EUR 100``` gives ```£50.99 + €100.00``` when viewed in browser set to British English.
+Input ```GBP 50.99 | EUR 100``` gives ```50,99 £GB + 100,00 €``` using browser set to French.
+
