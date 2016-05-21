@@ -34,7 +34,7 @@ class TextformatterCurrency extends WireData implements Module, ConfigurableModu
     {
         return array(
             'title'     => __('Textformatter for currencies.'),
-            'version'   => '1.0.1',
+            'version'   => '1.1.0',
             'summary'   => __('Provides a locale-aware currency formatter for text fields.'),
             'permanent' => false,
             'singular'  => true,
@@ -43,17 +43,63 @@ class TextformatterCurrency extends WireData implements Module, ConfigurableModu
     }
 
 
+    /**
+     * Set the locale to use.
+     *
+     * If one of the key strings "browser"|"header"|"headers" is passed in, it will cause the module to attempt to use
+     * the browser's httpAccept headers to define the locale to use.
+     *
+     * Providing a string other than these will turn off accept header searching and use the given string as the locale.
+     *
+     * @param string $locale A non-empty string either "browser"|"header"|"headers"|<locale string>
+     * @return bool true if the locale was accepted and set
+     */
+    public function useLocale($locale) {
+        if (!is_string($locale) || empty(trim($locale))) {
+            return false;
+        }
+
+        $locale = trim($locale);
+
+        if (in_array(strtolower($locale), array('browser', 'header', 'headers'))) {
+            $this->tfc_use_browser_locale = '1';
+        } else {
+            $this->tfc_use_browser_locale = '0';
+            $this->tfc_locale = $locale;
+        }
+
+        return true;
+    }
+
+
+    /**
+     * Old style format() method
+     *
+     * NB: Changes the input $str variable
+     */
     public function format(&$str) {
-        if(!strlen($str)) return;
+        if (!strlen($str)) return;
         $str = $this->formatCurrency($str);
     }
 
+
+    /**
+     * New style format method
+     *
+     * NB: Changes the input $str variable
+     */
     public function formatValue(Page $page, Field $field, &$str) {
-        if(!strlen($str)) return;
+        if (!strlen($str)) return;
         $str = $this->formatCurrency($str);
     }
 
-    protected function formatCurrency($str) {
+
+    /**
+     * Common format method
+     */
+    public function formatCurrency($str) {
+        if (!strlen($str)) return '';
+
         $locale = ($this->tfc_locale) ?: 'en';
         if ($this->tfc_use_browser_locale) {
             $locale = locale_accept_from_http($_SERVER['HTTP_ACCEPT_LANGUAGE']);
